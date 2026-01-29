@@ -14,10 +14,10 @@ try:
     from mamba_ssm.ops.selective_scan_interface import selective_scan_fn
     from einops import repeat
     EMVM_AVAILABLE = True
-    print("✅ EMVM 依赖已加载")
+    print("EMVM 依赖已加载")
 except ImportError as e:
     EMVM_AVAILABLE = False
-    print(f"⚠️  EMVM 不可用: {e}")
+    print(f"EMVM 不可用: {e}")
 
 class DynamicFusionGate(nn.Module):
 
@@ -76,7 +76,7 @@ class EfficientFusionModule(nn.Module):
 
 
         if not self.use_ema and not self.use_emvm:
-            raise ValueError("至少需要启用 EMA 或 EMVM 中的一个！")
+            raise ValueError("至少启用一个！")
 
 
         if self.use_ema:
@@ -136,11 +136,11 @@ class EfficientFusionModule(nn.Module):
 
         if len(mode_parts) == 2:
             if self.use_adaptive_gate:
-                mode += " (自适应门控)"
+                mode += " (DFG)"
             else:
-                mode += f" (固定权重 {self.fixed_ema_weight:.1f}:{1-self.fixed_ema_weight:.1f})"
+                mode += f" ({self.fixed_ema_weight:.1f}:{1-self.fixed_ema_weight:.1f})"
 
-        print(f"✅ EfficientFusion 配置: {mode}")
+        print(f"EfficientFusion: {mode}")
 
     def forward(self, x):
 
@@ -481,7 +481,7 @@ class SS2D_Block(nn.Module):
         #     out = self.upsample(out).permute(0, 2, 3, 1).contiguous()
         if self.ss2d_type == 3:
             out = out.permute(0, 3, 1, 2).contiguous()
-            out = self.upsample(out)  # 可能变成 20×20
+            out = self.upsample(out)
 
             if original_shape is not None:
                 out = F.interpolate(out, size=original_shape, mode='bilinear',
@@ -584,10 +584,10 @@ if __name__ == "__main__":
 
     if torch.cuda.is_available():
         device = torch.device('cuda')
-        print(f"✅ 使用 GPU 进行测试")
+        print(f"GPU")
     else:
         device = torch.device('cpu')
-        print(f"⚠️  GPU 不可用，将使用 CPU (EMVM 会被禁用)")
+        print(f"CPU")
 
     x = torch.randn(B, C, H, W).to(device)
 
